@@ -793,7 +793,7 @@ if __name__ == "__main__":
                 )
 
                 if FLAGS.local_rank == 0 and FLAGS.validate:
-                    validate(glctx, geometry, mat, lgt, dataset_validate, os.path.join(FLAGS.out_dir, f"val_viz/dmtet_validate_{FLAGS.index}_{k}_{FLAGS.split_size}"), FLAGS)
+                    validate(glctx, geometry, mat, lgt, dataset_validate, os.path.join(FLAGS.out_dir, f"val_viz/dmtet_validate_{global_index}_{FLAGS.index}_{k}_{FLAGS.split_size}"), FLAGS)
 
                 # Free temporaries / cached memory
                 del geometry
