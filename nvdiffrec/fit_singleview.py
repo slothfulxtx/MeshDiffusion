@@ -719,6 +719,8 @@ if __name__ == "__main__":
     print("Start optimization")
     sys.stdout.flush()
 
+    global_index = 0
+
     if FLAGS.resume_path is None:
         # Run optimization
         geometry, mat = optimize_mesh(glctx, geometry, mat, lgt, dataset_train, dataset_validate, 
@@ -742,7 +744,7 @@ if __name__ == "__main__":
         old_geometry = geometry
 
         if FLAGS.local_rank == 0 and FLAGS.validate:
-            validate(glctx, geometry, mat, lgt, dataset_validate, os.path.join(FLAGS.out_dir, f"val_viz_pre/dmtet_validate_{FLAGS.index}_{k}_{FLAGS.split_size}"), FLAGS)
+            validate(glctx, geometry, mat, lgt, dataset_validate, os.path.join(FLAGS.out_dir, f"val_viz_pre/dmtet_validate_{global_index}"), FLAGS)
 
     else:
         dmt_dict = torch.load(os.path.join(FLAGS.resume_path, 'tets_pre/dmt_dict_{:05d}.pt'.format(global_index)))
