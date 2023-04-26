@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--target', type=str)
     FLAGS = parser.parse_args()
 
-    tet_path = f'../nvdiffrec/data/tets/{FLAGS.resolution}_tets_cropped.npz'
+    tet_path = f'./data/tets/{FLAGS.resolution}_tets_cropped.npz'
     tet = np.load(tet_path)
     vertices = torch.tensor(tet['vertices'])
     vertices_unique = vertices[:].unique()
@@ -40,10 +40,11 @@ if __name__ == "__main__":
 
     tets_folder = os.path.join(save_folder, FLAGS.source)
 
-    for k in tqdm.trange(FLAGS.split_size):
-        global_index = k + FLAGS.index * FLAGS.split_size
-        tet_path = os.path.join(tets_folder, 'dmt_dict_{:05d}.pt'.format(global_index))
-        if os.path.exists(tet_path):
-            tet = torch.load(tet_path, map_location="cpu")
-            grid = tet_to_grids(vertices_discretized, (tet['sdf'].unsqueeze(-1), tet['deform']), FLAGS.resolution)
-            torch.save(grid, os.path.join(grid_folder, 'grid_{:05d}.pt'.format(global_index)))
+    tet_paths = os.listdir(tets_folder)
+    tet_paths = filter(lambda x:x.endswith('.pt'), tet_paths)
+    
+    for tet_path in tet_paths:
+        tet = torch.load(os.path.join(tets_folder, tet_path), map_location="cpu")
+        grid = tet_to_grids(vertices_discretized, (tet['sdf'].unsqueeze(-1), tet['deform']), FLAGS.resolution)
+        tet_name = tet_path[:-3]
+        np.save(os.path.join(grid_folder, '%s.npy'% tet_name), grid.unsqueeze(0).numpy())
