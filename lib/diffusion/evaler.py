@@ -156,7 +156,7 @@ def cond_gen(
 
         resolution = config.data.image_size
         grid_mask = torch.load(f'./data/grid_mask_{resolution}.pt').view(1, 1, resolution, resolution, resolution).to("cuda")
-
+        grid_mask = grid_mask.repeat(1, 4, 1, 1, 1)
         sampling_eps = 1e-3
         sampling_shape = (config.eval.batch_size,
                         config.data.num_channels,
@@ -180,6 +180,7 @@ def cond_gen(
 
         partial_dict = torch.load(config.eval.partial_dmtet_path)
         partial_sdf = partial_dict['sdf']
+        # partial_deform = partial_dict['deform'].transpose(0,1)
         partial_mask = partial_dict['vis']
 
 
@@ -197,13 +198,18 @@ def cond_gen(
         
         partial_sdf_grid = torch.zeros((1, 1, resolution, resolution, resolution))
         partial_sdf_grid[0, 0, ind_to_coord[:, 0], ind_to_coord[:, 1], ind_to_coord[:, 2]] = partial_sdf
+        # partial_deform_grid = torch.zeros((1, 3, resolution, resolution, resolution))
+        # partial_deform_grid[0, :, ind_to_coord[:, 0], ind_to_coord[:, 1], ind_to_coord[:, 2]] = partial_deform
         partial_mask_grid = torch.zeros((1, 1, resolution, resolution, resolution))
         partial_mask_grid[0, 0, ind_to_coord[:, 0], ind_to_coord[:, 1], ind_to_coord[:, 2]] = partial_mask.float()
 
         samples, n = sampling_fn(
             score_model, 
             partial=partial_sdf_grid.cuda(), 
-            partial_mask=partial_mask_grid.cuda(), 
+            partial_mask=partial_mask_grid.cuda(),
+            # partial=torch.cat([partial_sdf_grid.cuda(),partial_deform_grid.cuda()],dim=1), 
+            # partial_mask=partial_mask_grid.cuda().repeat(1,4,1,1,1), 
+            # partial_channel=[0,1,2,3],
             freeze_iters=config.eval.freeze_iters
         )
 
