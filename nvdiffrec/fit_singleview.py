@@ -792,7 +792,7 @@ if __name__ == "__main__":
     ##### Process single-view tet grid
     dataloader_validate = torch.utils.data.DataLoader(dataset_validate, batch_size=1, collate_fn=dataset_train.collate)
     
-    v_it = iter(dataloader_validate)
+    v_curr = v_it = iter(dataloader_validate)
     for _ in range(FLAGS.angle_ind):
         v_curr = next(v_it)
 
