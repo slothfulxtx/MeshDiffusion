@@ -135,3 +135,7 @@ workspace/
 
 # pretrained
 pretrained/
+
+# json
+
+/metadata/*.json
